@@ -13,14 +13,7 @@ const tagController = require("./controllers/tag");
 const app = express();
 const port = process.env.PORT || 8085;
 const corsOptions = {
-  origin: [
-    "http://localhost:8080",
-    "http://localhost:3000",
-    "http://admin.bamis.ir",
-    "https://bartarha.net",
-    "https://app.bamis.ir",
-    "http://stageadmin.bamis.ir",
-  ],
+  origin: [process.env.BASE_ORIGIN, process.env.VIEW_ORIGIN],
 };
 
 //Middleware

@@ -1,7 +1,7 @@
 const Tag = require("../models/Tag");
 
 const TagValidator = {
-  checkTag: async (body) => {
+  checkValid: async (body, isNew) => {
     const errors = [];
     if (!body.slug) {
       errors.push({
@@ -27,13 +27,15 @@ const TagValidator = {
         });
       }
     }
-    const tag = await Tag.find({ slug: body.slug });
-    if (tag.length > 0) {
-      errors.push({
-        message: "  این شناسه قبلا ثبت شده است.",
-        error: "slug is already in the list.",
-        key: "slug",
-      });
+    if (isNew) {
+      const tag = await Tag.find({ slug: body.slug });
+      if (tag.length > 0) {
+        errors.push({
+          message: "  این شناسه قبلا ثبت شده است.",
+          error: "slug is already in the list.",
+          key: "slug",
+        });
+      }
     }
 
     return errors;

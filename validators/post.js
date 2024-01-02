@@ -2,7 +2,7 @@ const Author = require("../models/Author");
 const Tag = require("../models/Tag");
 
 const PostValidator = {
-  checkPost: async (body) => {
+  checkValid: async (body) => {
     const errors = [];
     if (body.title?.length > 100) {
       errors.push({

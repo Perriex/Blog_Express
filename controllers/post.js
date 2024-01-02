@@ -6,7 +6,7 @@ const router = require("express").Router();
 router.post("/create", async (req, res) => {
   try {
     const payload = req.body;
-    const messages = await PostValidator.checkPost(payload);
+    const messages = await PostValidator.checkValid(payload);
 
     if (messages.length > 0) {
       res.status(400).json({ errors: messages });

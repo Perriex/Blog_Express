@@ -21,24 +21,4 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.post("/update/:slug", async (req, res) => {
-  try {
-    const payload = req.body;
-    const query = req.query.slug;
-
-    const messages = await TagValidator.checkValid(payload);
-
-    if (messages) {
-      res.status(400).json({ errors: messages });
-      return;
-    }
-
-    await new Tag(payload).save();
-    const list = await Tag.find();
-    res.status(200).json(list);
-  } catch (error) {
-    res.status(500).json(error);
-  }
-});
-
 module.exports = router;

@@ -1,7 +1,7 @@
 const Author = require("../models/Author");
 
 const AuthorValidator = {
-  checkValid: async (body) => {
+  checkPayload: async (body) => {
     const errors = [];
     if (!body.authorId) {
       errors.push({

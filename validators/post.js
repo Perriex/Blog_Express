@@ -2,7 +2,7 @@ const Author = require("../models/Author");
 const Tag = require("../models/Tag");
 
 const PostValidator = {
-  checkValid: async (body) => {
+  checkPayload: async (body) => {
     const errors = [];
     if (body.title?.length > 100) {
       errors.push({
@@ -42,7 +42,7 @@ const PostValidator = {
     }
     if (body.tags?.length > 0) {
       for (let t in body.tags) {
-        const tag = await Tag.find({ slug: t });
+        const tag = await Tag.find({ slug: t.id });
         if (tag.length === 0)
           errors.push({
             message: "دسته بندی " + t + " وجود ندارد.",

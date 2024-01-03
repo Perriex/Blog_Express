@@ -1,4 +1,5 @@
 const Tag = require("../models/Tag");
+const Post = require("../models/Post");
 const TagValidator = require("../validators/tag");
 
 const router = require("express").Router();
@@ -6,16 +7,105 @@ const router = require("express").Router();
 router.post("/create", async (req, res) => {
   try {
     const payload = req.body;
-    const messages = await TagValidator.checkValid(payload, true);
+    const messages = await TagValidator.checkPayload(payload, true);
 
-    if (messages) {
+    if (messages.length > 0) {
       res.status(400).json({ errors: messages });
       return;
     }
 
-    await new Tag(payload).save();
-    const list = await Tag.find();
-    res.status(200).json(list);
+    const saveTag = new Tag(payload);
+    const savedTag = await saveTag.save();
+
+    res.status(200).json({ code: 200, data: savedTag });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.post("/update/:slug", async (req, res) => {
+  try {
+    const payload = req.body;
+    const slug = req.params.slug;
+
+    const messages = await TagValidator.checkPayload(payload);
+    const existness = await TagValidator.checkSlug(slug);
+
+    if (messages.length > 0 || existness) {
+      res.status(400).json({ errors: [...messages, existness] });
+      return;
+    }
+
+    await Tag.updateOne({ slug }, payload);
+
+    res.status(200).json({ code: 200, data: payload });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.get("/all", async (req, res) => {
+  try {
+    const tags = await Tag.find({});
+    const posts = await Post.find({});
+
+    const data = tags.map((item) => {
+      const count = posts.filter((post) =>
+        Object.values(post.tags)
+          .map((t) => t.id)
+          .includes(item.slug)
+      ).length;
+      return {
+        ...item._doc,
+        count,
+      };
+    });
+
+    res.status(200).json({ code: 200, data });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.post("/delete/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+
+    await Tag.deleteMany({ slug });
+
+    res
+      .status(200)
+      .json({
+        code: 200,
+        message: "دسته بندی با موفقیت حذف شد، اما در دسته بندی پست ها باقی مانده است.",
+      });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+router.get("/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const existness = await TagValidator.checkSlug(slug);
+
+    if (existness) {
+      res.status(400).json({ errors: [existness] });
+      return;
+    }
+
+    const tag = await Tag.findOne({ slug });
+    const posts = await Tag.find({
+      tags: {
+        $elemMatch: {
+          id: slug,
+        },
+      },
+    });
+
+    res
+      .status(200)
+      .json({ code: 200, data: { ...tag._doc, postCount: posts.length } });
   } catch (error) {
     res.status(500).json(error);
   }

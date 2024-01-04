@@ -32,7 +32,9 @@ router.post("/update/:slug", async (req, res) => {
     const existness = await TagValidator.checkSlug(slug);
 
     if (messages.length > 0 || existness) {
-      res.status(400).json({ errors: [...messages, existness] });
+      res
+        .status(400)
+        .json({ errors: existness ? [...messages, existness] : messages });
       return;
     }
 
@@ -51,9 +53,7 @@ router.get("/all", async (req, res) => {
 
     const data = tags.map((item) => {
       const count = posts.filter((post) =>
-        Object.values(post.tags)
-          .map((t) => t.id)
-          .includes(item.slug)
+        post.tags.includes(item.slug)
       ).length;
       return {
         ...item._doc,
@@ -70,15 +70,19 @@ router.get("/all", async (req, res) => {
 router.post("/delete/:slug", async (req, res) => {
   try {
     const slug = req.params.slug;
+    const existness = await TagValidator.checkSlug(slug);
 
+    if (existness) {
+      res.status(400).json({ errors: [existness] });
+      return;
+    }
     await Tag.deleteMany({ slug });
 
-    res
-      .status(200)
-      .json({
-        code: 200,
-        message: "دسته بندی با موفقیت حذف شد، اما در دسته بندی پست ها باقی مانده است.",
-      });
+    res.status(200).json({
+      code: 200,
+      message:
+        "دسته بندی با موفقیت حذف شد، اما در دسته بندی پست ها باقی مانده است.",
+    });
   } catch (error) {
     res.status(500).json(error);
   }
@@ -95,12 +99,8 @@ router.get("/:slug", async (req, res) => {
     }
 
     const tag = await Tag.findOne({ slug });
-    const posts = await Tag.find({
-      tags: {
-        $elemMatch: {
-          id: slug,
-        },
-      },
+    const posts = await Post.find({
+      tags: slug,
     });
 
     res

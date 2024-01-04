@@ -21,12 +21,7 @@ const postSchema = new mongoose.Schema(
       },
     ],
     tags: {
-      type: [
-        {
-          id: { type: String, required: true },
-          name: { type: String, required: true },
-        },
-      ],
+      type: [String],
       required: true,
     },
     creatorId: { type: Number, required: true },

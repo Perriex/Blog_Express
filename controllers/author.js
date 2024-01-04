@@ -32,7 +32,9 @@ router.post("/update/:authorId", async (req, res) => {
     const existness = await AuthorValidator.checkId(authorId);
 
     if (messages.length > 0 || existness) {
-      res.status(400).json({ errors: [...messages, existness] });
+      res
+        .status(400)
+        .json({ errors: existness ? [...messages, existness] : messages });
       return;
     }
 

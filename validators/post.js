@@ -1,5 +1,6 @@
 const Author = require("../models/Author");
 const Tag = require("../models/Tag");
+const Post = require("../models/Post");
 
 const PostValidator = {
   checkPayload: async (body) => {
@@ -41,12 +42,12 @@ const PostValidator = {
       });
     }
     if (body.tags?.length > 0) {
-      for (let t in body.tags) {
-        const tag = await Tag.find({ slug: t.id });
+      for (let i = 0; i < body.tags.length; i++) {
+        const tag = await Tag.find({ slug: body.tags[i] });
         if (tag.length === 0)
           errors.push({
-            message: "دسته بندی " + t + " وجود ندارد.",
-            error: t + " is not found.",
+            message: "دسته بندی " + body.tags[i] + " وجود ندارد.",
+            error: body.tags[i] + " is not found.",
             key: "tag[]",
           });
       }
@@ -65,6 +66,17 @@ const PostValidator = {
       });
     }
     return errors;
+  },
+  checkId: async (id) => {
+    const post = await Post.findOne({ _id: id });
+    if (!post) {
+      return {
+        message: "کلید پست پیدا نشد.",
+        error: "id is not in the list.",
+        key: "id",
+      };
+    }
+    return false;
   },
 };
 

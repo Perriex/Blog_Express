@@ -93,9 +93,8 @@ router.post("/delete/:authorId", async (req, res) => {
       return;
     }
 
-    const deletedPosts = posts.filter(async (post) => {
+    const relatedPosts = posts.filter(async (post) => {
       if (post.author.id === item.authorId) {
-        await Post.deleteOne(post);
         return post;
       }
       return false;
@@ -106,8 +105,8 @@ router.post("/delete/:authorId", async (req, res) => {
     res.status(200).json({
       code: 200,
       message:
-        "نویسنده با موفقیت حذف شد، پست های مربوط به این نویسنده حذف شدند.",
-      posts: deletedPosts,
+        "نویسنده با موفقیت حذف شد، پست های مربوط به این نویسنده حذف نشدند.",
+      posts: relatedPosts,
     });
   } catch (error) {
     res.status(500).json(error);

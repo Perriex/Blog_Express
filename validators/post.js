@@ -78,6 +78,18 @@ const PostValidator = {
     }
     return false;
   },
+  checkToggleValue: (payload) => {
+    if (!("isActive" in payload)) {
+      return [
+        {
+          message: "درخواست نا معتبر است.",
+          error: "isActive is not declared.",
+          key: "isActive",
+        },
+      ];
+    }
+    return false;
+  },
 };
 
 module.exports = PostValidator;

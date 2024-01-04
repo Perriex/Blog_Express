@@ -5,7 +5,7 @@ const postSchema = new mongoose.Schema(
     title: { type: String, required: true, maxLegth: 100 },
     content: { type: String, required: true },
     brief: { type: String, required: true, maxLegth: 250 },
-    active: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
     author: {
       type: {
         id: { type: Number, required: true },

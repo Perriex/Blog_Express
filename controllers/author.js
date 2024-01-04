@@ -64,10 +64,10 @@ router.get("/all", async (req, res) => {
     const name = req.query.name;
 
     const filter = {};
-
+    
     if (isActive) filter.isActive = isActive;
     if (name) filter.name = { $regex: name };
-
+    
     const data = await Author.find(filter);
 
     res.status(200).json({ code: 200, data });

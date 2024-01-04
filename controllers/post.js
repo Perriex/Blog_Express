@@ -61,6 +61,7 @@ router.get("/all", async (req, res) => {
     const search = req.query.search;
     const tagId = req.query.tag;
     const authorName = req.query.author;
+    const isActive = req.query.isActive;
 
     const filter = {};
 
@@ -77,6 +78,7 @@ router.get("/all", async (req, res) => {
     if (authorName) {
       filter["author.name"] = { $regex: authorName };
     }
+    if (isActive) filter.isActive = isActive;
 
     const data = await Post.find(filter);
 

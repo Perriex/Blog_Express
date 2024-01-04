@@ -1,5 +1,4 @@
 const Tag = require("../models/Tag");
-const Post = require("../models/Post");
 const TagValidator = require("../validators/tag");
 
 const router = require("express").Router();
@@ -48,18 +47,7 @@ router.post("/update/:slug", async (req, res) => {
 
 router.get("/all", async (req, res) => {
   try {
-    const tags = await Tag.find({});
-    const posts = await Post.find({});
-
-    const data = tags.map((item) => {
-      const count = posts.filter((post) =>
-        post.tags.includes(item.slug)
-      ).length;
-      return {
-        ...item._doc,
-        count,
-      };
-    });
+    const data = await Tag.find({});
 
     res.status(200).json({ code: 200, data });
   } catch (error) {
@@ -99,13 +87,7 @@ router.get("/:slug", async (req, res) => {
     }
 
     const tag = await Tag.findOne({ slug });
-    const posts = await Post.find({
-      tags: slug,
-    });
-
-    res
-      .status(200)
-      .json({ code: 200, data: { ...tag._doc, count: posts.length } });
+    res.status(200).json({ code: 200, data: tag });
   } catch (error) {
     res.status(500).json(error);
   }

@@ -61,21 +61,14 @@ router.post("/update/:authorId", async (req, res) => {
 router.get("/all", async (req, res) => {
   try {
     const isActive = req.query.isActive;
+    const name = req.query.name;
 
-    const authors = await Author.find(
-      isActive !== undefined ? { isActive } : {}
-    );
-    const posts = await Post.find({});
+    const filter = {};
 
-    const data = authors.map((item) => {
-      const count = posts.filter(
-        (post) => post.author.id === item.authorId
-      ).length;
-      return {
-        ...item._doc,
-        count,
-      };
-    });
+    if (isActive) filter.isActive = isActive;
+    if (name) filter.name = { $regex: name };
+
+    const data = await Author.find(filter);
 
     res.status(200).json({ code: 200, data });
   } catch (error) {
@@ -163,17 +156,8 @@ router.get("/:authorId", async (req, res) => {
     }
 
     const author = await Author.findOne({ authorId });
-    const posts = await Post.find({
-      author: {
-        $elemMatch: {
-          id: authorId,
-        },
-      },
-    });
 
-    res
-      .status(200)
-      .json({ code: 200, data: { ...author._doc, count: posts.length } });
+    res.status(200).json({ code: 200, data: author });
   } catch (error) {
     res.status(500).json(error);
   }

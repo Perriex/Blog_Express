@@ -18,6 +18,15 @@ router.post("/create", async (req, res) => {
 
     const savePost = new Post(payload);
     const savedPost = await savePost.save();
+    await Author.updateOne(
+      { authorId: payload.author.id },
+      { $inc: { count: 1 } }
+    );
+    await Tag.updateMany(
+      { slug: { $in: payload.tags } },
+      { $inc: { count: 1 } }
+    );
+
     res.status(200).json(savedPost);
   } catch (error) {
     res.status(500).json(error);
@@ -66,6 +75,18 @@ router.post("/delete/:id", async (req, res) => {
       res.status(400).json({ errors: [existness] });
       return;
     }
+
+    const post = await Post.findOne({ _id: id });
+
+    await Author.updateOne(
+      { authorId: post.author.id },
+      { $inc: { count: -1 } }
+    );
+    await Tag.updateMany(
+      { slug: { $in: post.tags } },
+      { $inc: { count: -1 } }
+    );
+
     await Post.deleteMany({ _id: id });
 
     res.status(200).json({
@@ -95,12 +116,10 @@ router.get("/:id", async (req, res) => {
       authorId: post.author.id,
     });
 
-    res
-      .status(200)
-      .json({
-        code: 200,
-        data: { ...post._doc, detailedTags: tags, detailedAuthor: author },
-      });
+    res.status(200).json({
+      code: 200,
+      data: { ...post._doc, detailedTags: tags, detailedAuthor: author },
+    });
   } catch (error) {
     res.status(500).json(error);
   }

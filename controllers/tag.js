@@ -105,7 +105,7 @@ router.get("/:slug", async (req, res) => {
 
     res
       .status(200)
-      .json({ code: 200, data: { ...tag._doc, postCount: posts.length } });
+      .json({ code: 200, data: { ...tag._doc, count: posts.length } });
   } catch (error) {
     res.status(500).json(error);
   }

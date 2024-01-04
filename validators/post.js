@@ -27,12 +27,18 @@ const PostValidator = {
       });
     }
     if (body.author) {
-      const author = await Author.find({ authorId: body.author.id });
-      if (author.length === 0)
+      const author = await Author.findOne({ authorId: body.author.id });
+      if (!author)
         errors.push({
           message: "نویسنده وارد شده در لیست نویسندگان وجود ندارد.",
           error: body.author.id + " is not found.",
           key: "author",
+        });
+      if (!author.isActive)
+        errors.push({
+          message: "نویسنده وارد شده امکان ثبت پست ندارد.",
+          error: body.author.name + " is not active.",
+          key: "author.isActive",
         });
     } else {
       errors.push({
